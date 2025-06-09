@@ -217,18 +217,27 @@
       }
     }
 
-    // 添加节点到画布
+    /**
+     * 向画布添加新节点
+     * @param {string} name  节点类型名称（如 'facebook', 'slack' 等）
+     * @param {number} pos_x 鼠标拖拽时的 X 坐标（相对于画布）
+     * @param {number} pos_y 鼠标拖拽时的 Y 坐标（相对于画布）
+     */
     function addNodeToDrawFlow(name, pos_x, pos_y) {
+      // 如果当前为锁定模式，则不允许添加节点
       if(editor.editor_mode === 'fixed') {
         return false;
       }
-      // 计算缩放和平移后的实际坐标
-      pos_x = pos_x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) - (editor.precanvas.getBoundingClientRect().x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
-      pos_y = pos_y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) - (editor.precanvas.getBoundingClientRect().y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
+      // 计算节点实际插入的坐标（考虑画布缩放和平移）
+      pos_x = pos_x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) 
+            - (editor.precanvas.getBoundingClientRect().x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
+      pos_y = pos_y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) 
+            - (editor.precanvas.getBoundingClientRect().y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
 
-      // 根据节点类型添加不同内容
+      // 根据节点类型，生成不同的节点内容和输入输出端口数量
       switch (name) {
         case 'facebook':
+          // Facebook 节点：0个输入，1个输出
           var facebook = `
           <div>
             <div class="title-box"><i class="fab fa-facebook"></i> Facebook Message</div>
@@ -237,6 +246,7 @@
           editor.addNode('facebook', 0,  1, pos_x, pos_y, 'facebook', {}, facebook );
           break;
         case 'slack':
+          // Slack 节点：1个输入，0个输出
           var slackchat = `
           <div>
             <div class="title-box"><i class="fab fa-slack"></i> Slack chat message</div>
@@ -245,6 +255,7 @@
           editor.addNode('slack', 1, 0, pos_x, pos_y, 'slack', {}, slackchat );
           break;
         case 'github':
+          // Github 节点：0个输入，1个输出，带输入框
           var githubtemplate = `
           <div>
             <div class="title-box"><i class="fab fa-github "></i> Github Stars</div>
@@ -257,6 +268,7 @@
           editor.addNode('github', 0, 1, pos_x, pos_y, 'github', { "name": ''}, githubtemplate );
           break;
         case 'telegram':
+          // Telegram 节点：1个输入，0个输出，带下拉框
           var telegrambot = `
           <div>
             <div class="title-box"><i class="fab fa-telegram-plane"></i> Telegram bot</div>
@@ -275,6 +287,7 @@
           editor.addNode('telegram', 1, 0, pos_x, pos_y, 'telegram', { "channel": 'channel_3'}, telegrambot );
           break;
         case 'aws':
+          // AWS 节点：1个输入，1个输出，带输入框
           var aws = `
           <div>
             <div class="title-box"><i class="fab fa-aws"></i> Aws Save </div>
@@ -289,44 +302,48 @@
           editor.addNode('aws', 1, 1, pos_x, pos_y, 'aws', { "db": { "dbname": '', "key": '' }}, aws );
           break;
         case 'log':
-            var log = `
-            <div>
-              <div class="title-box"><i class="fas fa-file-signature"></i> Save log file </div>
+          // Log 节点：1个输入，0个输出
+          var log = `
+          <div>
+            <div class="title-box"><i class="fas fa-file-signature"></i> Save log file </div>
+          </div>
+          `;
+          editor.addNode('log', 1, 0, pos_x, pos_y, 'log', {}, log );
+          break;
+        case 'google':
+          // Google Drive 节点：1个输入，0个输出
+          var google = `
+          <div>
+            <div class="title-box"><i class="fab fa-google-drive"></i> Google Drive save </div>
+          </div>
+          `;
+          editor.addNode('google', 1, 0, pos_x, pos_y, 'google', {}, google );
+          break;
+        case 'email':
+          // Email 节点：1个输入，0个输出
+          var email = `
+          <div>
+            <div class="title-box"><i class="fas fa-at"></i> Send Email </div>
+          </div>
+          `;
+          editor.addNode('email', 1, 0, pos_x, pos_y, 'email', {}, email );
+          break;
+        case 'template':
+          // Template 节点：1个输入，1个输出，带文本域
+          var template = `
+          <div>
+            <div class="title-box"><i class="fas fa-code"></i> Template</div>
+            <div class="box">
+              Ger Vars
+              <textarea df-template></textarea>
+              Output template with vars
             </div>
-            `;
-            editor.addNode('log', 1, 0, pos_x, pos_y, 'log', {}, log );
-            break;
-          case 'google':
-            var google = `
-            <div>
-              <div class="title-box"><i class="fab fa-google-drive"></i> Google Drive save </div>
-            </div>
-            `;
-            editor.addNode('google', 1, 0, pos_x, pos_y, 'google', {}, google );
-            break;
-          case 'email':
-            var email = `
-            <div>
-              <div class="title-box"><i class="fas fa-at"></i> Send Email </div>
-            </div>
-            `;
-            editor.addNode('email', 1, 0, pos_x, pos_y, 'email', {}, email );
-            break;
-
-          case 'template':
-            var template = `
-            <div>
-              <div class="title-box"><i class="fas fa-code"></i> Template</div>
-              <div class="box">
-                Ger Vars
-                <textarea df-template></textarea>
-                Output template with vars
-              </div>
-            </div>
-            `;
-            editor.addNode('template', 1, 1, pos_x, pos_y, 'template', { "template": 'Write your template'}, template );
-            break;
+          </div>
+          `;
+          editor.addNode('template', 1, 1, pos_x, pos_y, 'template', { "template": 'Write your template'}, template );
+          break;
         case 'multiple':
+          // Multiple 节点：3个输入，4个输出
           var multiple = `
           <div>
             <div class="box">
@@ -337,42 +354,45 @@
           editor.addNode('multiple', 3, 4, pos_x, pos_y, 'multiple', {}, multiple );
           break;
         case 'vertical':
+          // Vertical 节点：输入端口在顶部，输出端口在底部（用于上下连线演示）
           var vertical = `
           <div>
             <div class="title-box">Vertical node</div>
           </div>
           `;
+          // 传入 ['top'] 和 ['bottom']，让输入输出端口分别在节点上下
           editor.addNode('vertical', ['top'], ['bottom'], pos_x, pos_y, 'vertical', {}, vertical );
           break;
         case 'personalized':
+          // Personalized 节点：1个输入，1个输出
           var personalized = `
           <div>
             Personalized
           </div>
-            `;
-            editor.addNode('personalized', 1, 1, pos_x, pos_y, 'personalized', {}, personalized );
-            break;
-          case 'dbclick':
-            var dbclick = `
-            <div>
+          `;
+          editor.addNode('personalized', 1, 1, pos_x, pos_y, 'personalized', {}, personalized );
+          break;
+        case 'dbclick':
+          // DBClick 节点：1个输入，1个输出，带双击弹窗
+          var dbclick = `
+          <div>
             <div class="title-box"><i class="fas fa-mouse"></i> Db Click</div>
-              <div class="box dbclickbox" ondblclick="showpopup(event)">
-                Db Click here
-                <div class="modal" style="display:none">
-                  <div class="modal-content">
-                    <span class="close" onclick="closemodal(event)">&times;</span>
-                    Change your variable {name} !
-                    <input type="text" df-name>
-                  </div>
-
+            <div class="box dbclickbox" ondblclick="showpopup(event)">
+              Db Click here
+              <div class="modal" style="display:none">
+                <div class="modal-content">
+                  <span class="close" onclick="closemodal(event)">&times;</span>
+                  Change your variable {name} !
+                  <input type="text" df-name>
                 </div>
               </div>
             </div>
-            `;
-            editor.addNode('dbclick', 1, 1, pos_x, pos_y, 'dbclick', { name: ''}, dbclick );
-            break;
-
+          </div>
+          `;
+          editor.addNode('dbclick', 1, 1, pos_x, pos_y, 'dbclick', { name: ''}, dbclick );
+          break;
         default:
+          // 其他类型暂不处理
       }
     }
 
