@@ -53,6 +53,9 @@
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="multiple">
         <i class="fas fa-code-branch"></i><span> Multiple inputs/outputs</span>
       </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="vertical">
+        <i class="fas fa-arrows-alt-v"></i><span> Vertical node</span>
+      </div>
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="personalized">
         <i class="fas fa-fill"></i><span> Personalized</span>
       </div>
@@ -353,21 +356,29 @@
             `;
             editor.addNode('template', 1, 1, pos_x, pos_y, 'template', { "template": 'Write your template'}, template );
             break;
-          case 'multiple':
-            var multiple = `
-            <div>
-              <div class="box">
-                Multiple!
-              </div>
+        case 'multiple':
+          var multiple = `
+          <div>
+            <div class="box">
+              Multiple!
             </div>
-            `;
-            editor.addNode('multiple', 3, 4, pos_x, pos_y, 'multiple', {}, multiple );
-            break;
-          case 'personalized':
-            var personalized = `
-            <div>
-              Personalized
-            </div>
+          </div>
+          `;
+          editor.addNode('multiple', 3, 4, pos_x, pos_y, 'multiple', {}, multiple );
+          break;
+        case 'vertical':
+          var vertical = `
+          <div>
+            <div class="title-box">Vertical node</div>
+          </div>
+          `;
+          editor.addNode('vertical', ['top'], ['bottom'], pos_x, pos_y, 'vertical', {}, vertical );
+          break;
+        case 'personalized':
+          var personalized = `
+          <div>
+            Personalized
+          </div>
             `;
             editor.addNode('personalized', 1, 1, pos_x, pos_y, 'personalized', {}, personalized );
             break;

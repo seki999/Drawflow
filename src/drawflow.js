@@ -1203,22 +1203,48 @@ export default class Drawflow {
     const outputs = document.createElement('div');
     outputs.classList.add("outputs");
 
-    const json_inputs = {}
-    for(var x = 0; x < num_in; x++) {
-      const input = document.createElement('div');
-      input.classList.add("input");
-      input.classList.add("input_"+(x+1));
-      json_inputs["input_"+(x+1)] = { "connections": []};
-      inputs.appendChild(input);
+    const json_inputs = {};
+    if(Array.isArray(num_in)) {
+      num_in.forEach((pos, x) => {
+        const input = document.createElement('div');
+        input.classList.add("input");
+        input.classList.add("input_"+(x+1));
+        if(pos === 'top' || pos === 'bottom') {
+          input.classList.add(pos);
+        }
+        json_inputs["input_"+(x+1)] = { "connections": []};
+        inputs.appendChild(input);
+      });
+    } else {
+      for(var x = 0; x < num_in; x++) {
+        const input = document.createElement('div');
+        input.classList.add("input");
+        input.classList.add("input_"+(x+1));
+        json_inputs["input_"+(x+1)] = { "connections": []};
+        inputs.appendChild(input);
+      }
     }
 
-    const json_outputs = {}
-    for(var x = 0; x < num_out; x++) {
-      const output = document.createElement('div');
-      output.classList.add("output");
-      output.classList.add("output_"+(x+1));
-      json_outputs["output_"+(x+1)] = { "connections": []};
-      outputs.appendChild(output);
+    const json_outputs = {};
+    if(Array.isArray(num_out)) {
+      num_out.forEach((pos, x) => {
+        const output = document.createElement('div');
+        output.classList.add("output");
+        output.classList.add("output_"+(x+1));
+        if(pos === 'top' || pos === 'bottom') {
+          output.classList.add(pos);
+        }
+        json_outputs["output_"+(x+1)] = { "connections": []};
+        outputs.appendChild(output);
+      });
+    } else {
+      for(var x = 0; x < num_out; x++) {
+        const output = document.createElement('div');
+        output.classList.add("output");
+        output.classList.add("output_"+(x+1));
+        json_outputs["output_"+(x+1)] = { "connections": []};
+        outputs.appendChild(output);
+      }
     }
 
     const content = document.createElement('div');
