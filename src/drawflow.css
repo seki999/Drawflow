@@ -61,6 +61,22 @@
   margin-bottom: 5px;
 }
 
+.drawflow .drawflow-node .input.top,
+.drawflow .drawflow-node .output.top {
+  top: -10px;
+  left: calc(50% - 10px);
+  right: auto;
+  margin-bottom: 0;
+}
+
+.drawflow .drawflow-node .input.bottom,
+.drawflow .drawflow-node .output.bottom {
+  bottom: -10px;
+  left: calc(50% - 10px);
+  right: auto;
+  margin-bottom: 0;
+}
+
 .drawflow .drawflow-node .input {
   left: -27px;
   top: 2px;
