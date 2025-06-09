@@ -1,55 +1,67 @@
+/**
+ * Drawflow 主类，负责流程图编辑器的所有核心逻辑
+ */
 export default class Drawflow {
+  /**
+   * 构造函数，初始化编辑器
+   * @param {HTMLElement} container - 画布容器
+   * @param {Object} render - 渲染相关（可选，支持Vue等）
+   * @param {Object} parent - 父级（可选）
+   */
   constructor(container, render = null, parent = null) {
-    this.events = {};
-    this.container = container;
-    this.precanvas = null;
-    this.nodeId = 1;
-    this.ele_selected = null;
-    this.node_selected = null;
-    this.drag = false;
-    this.reroute = false;
-    this.reroute_fix_curvature = false;
-    this.curvature = 0.5;
-    this.reroute_curvature_start_end = 0.5;
-    this.reroute_curvature = 0.5;
-    this.reroute_width = 6;
-    this.drag_point = false;
-    this.editor_selected = false;
-    this.connection = false;
-    this.connection_ele = null;
-    this.connection_selected = null;
-    this.canvas_x = 0;
-    this.canvas_y = 0;
-    this.pos_x = 0;
-    this.pos_x_start = 0;
-    this.pos_y = 0;
-    this.pos_y_start = 0;
-    this.mouse_x = 0;
-    this.mouse_y = 0;
-    this.line_path = 5;
-    this.first_click = null;
-    this.force_first_input = false;
-    this.draggable_inputs = true;
-    this.useuuid = false;
-    this.parent = parent;
+    this.events = {}; // 事件监听器集合
+    this.container = container; // 画布容器
+    this.precanvas = null; // 实际画布（内部div）
+    this.nodeId = 1; // 节点自增ID
+    this.ele_selected = null; // 当前选中的元素
+    this.node_selected = null; // 当前选中的节点
+    this.drag = false; // 是否正在拖动节点
+    this.reroute = false; // 是否允许中间点拖动
+    this.reroute_fix_curvature = false; // 是否固定中间点曲率
+    this.curvature = 0.5; // 连线曲率
+    this.reroute_curvature_start_end = 0.5; // 中间点起止曲率
+    this.reroute_curvature = 0.5; // 中间点曲率
+    this.reroute_width = 6; // 中间点圆圈半径
+    this.drag_point = false; // 是否正在拖动中间点
+    this.editor_selected = false; // 是否选中编辑器（用于平移画布）
+    this.connection = false; // 是否正在连线
+    this.connection_ele = null; // 当前正在绘制的连线SVG元素
+    this.connection_selected = null; // 当前选中的连线
+    this.canvas_x = 0; // 画布x偏移
+    this.canvas_y = 0; // 画布y偏移
+    this.pos_x = 0; // 鼠标x坐标
+    this.pos_x_start = 0; // 鼠标x起始坐标
+    this.pos_y = 0; // 鼠标y坐标
+    this.pos_y_start = 0; // 鼠标y起始坐标
+    this.mouse_x = 0; // 鼠标当前x
+    this.mouse_y = 0; // 鼠标当前y
+    this.line_path = 5; // 连线路径宽度
+    this.first_click = null; // 第一次点击的元素
+    this.force_first_input = false; // 是否强制第一个输入
+    this.draggable_inputs = true; // 输入端口是否可拖动
+    this.useuuid = false; // 是否使用uuid作为节点ID
+    this.parent = parent; // 父级（用于Vue等）
 
-    this.noderegister = {};
-    this.render = render;
-    this.drawflow = { "drawflow": { "Home": { "data": {} }}};
-    // Configurable options
-    this.module = 'Home';
-    this.editor_mode = 'edit';
-    this.zoom = 1;
-    this.zoom_max = 1.6;
-    this.zoom_min = 0.5;
-    this.zoom_value = 0.1;
-    this.zoom_last_value = 1;
+    this.noderegister = {}; // 节点注册表（自定义节点）
+    this.render = render; // 渲染相关
+    this.drawflow = { "drawflow": { "Home": { "data": {} }}}; // 主数据结构
+    // 可配置选项
+    this.module = 'Home'; // 当前模块
+    this.editor_mode = 'edit'; // 编辑器模式（edit/fixed/view）
+    this.zoom = 1; // 当前缩放比例
+    this.zoom_max = 1.6; // 最大缩放
+    this.zoom_min = 0.5; // 最小缩放
+    this.zoom_value = 0.1; // 每次缩放步长
+    this.zoom_last_value = 1; // 上一次缩放值
 
-    // Mobile
-    this.evCache = new Array();
-    this.prevDiff = -1;
+    // 移动端缩放相关
+    this.evCache = new Array(); // 触摸事件缓存
+    this.prevDiff = -1; // 上一次两指距离
   }
 
+  /**
+   * 启动编辑器，初始化DOM和事件
+   */
   start () {
     // console.info("Start Drawflow!!");
     this.container.classList.add("parent-drawflow");
@@ -90,10 +102,16 @@ export default class Drawflow {
   }
 
   /* Mobile zoom */
+  /**
+   * 移动端缩放：指针按下
+   */
   pointerdown_handler(ev) {
    this.evCache.push(ev);
   }
 
+  /**
+   * 移动端缩放：指针移动
+   */
   pointermove_handler(ev) {
    for (var i = 0; i < this.evCache.length; i++) {
      if (ev.pointerId == this.evCache[i].pointerId) {
@@ -121,6 +139,9 @@ export default class Drawflow {
    }
   }
 
+  /**
+   * 移动端缩放：指针抬起
+   */
   pointerup_handler(ev) {
     this.remove_event(ev);
     if (this.evCache.length < 2) {
@@ -137,6 +158,9 @@ export default class Drawflow {
    }
   }
   /* End Mobile Zoom */
+  /**
+   * 加载流程数据，渲染所有节点和连线
+   */
   load() {
     for (var key in this.drawflow.drawflow[this.module].data) {
       this.addNodeImport(this.drawflow.drawflow[this.module].data[key], this.precanvas);
@@ -173,6 +197,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 处理节点/连线的选中、拖动、连线等鼠标事件
+   */
   click(e) {
     this.dispatch('click', e);
     if(this.editor_mode === 'fixed') {
@@ -336,6 +363,9 @@ export default class Drawflow {
     this.dispatch('clickEnd', e);
   }
 
+  /**
+   * 鼠标移动事件，处理节点拖动、连线拖动、画布平移等
+   */
   position(e) {
     if (e.type === "touchmove") {
       var e_pos_x = e.touches[0].clientX;
@@ -418,6 +448,9 @@ export default class Drawflow {
     this.dispatch('mouseMove', {x: e_pos_x,y: e_pos_y });
   }
 
+  /**
+   * 鼠标释放事件，结束拖动、连线等操作
+   */
   dragEnd(e) {
     if (e.type === "touchend") {
       var e_pos_x = this.mouse_x;
@@ -518,6 +551,9 @@ export default class Drawflow {
 
     this.dispatch('mouseUp', e);
   }
+  /**
+   * 右键菜单事件
+   */
   contextmenu(e) {
     this.dispatch('contextmenu', e);
     e.preventDefault();
@@ -546,12 +582,18 @@ export default class Drawflow {
     }
 
   }
+  /**
+   * 删除右键菜单
+   */
   contextmenuDel() {
     if(this.precanvas.getElementsByClassName("drawflow-delete").length) {
       this.precanvas.getElementsByClassName("drawflow-delete")[0].remove()
     };
   }
 
+  /**
+   * 键盘事件，处理删除节点/连线
+   */
   key(e) {
     this.dispatch('keydown', e);
     if(this.editor_mode === 'fixed' || this.editor_mode === 'view') {
@@ -569,6 +611,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 鼠标滚轮缩放事件
+   */
   zoom_enter(event, delta) {
     if (event.ctrlKey) {
       event.preventDefault()
@@ -581,6 +626,9 @@ export default class Drawflow {
       }
     }
   }
+  /**
+   * 刷新缩放
+   */
   zoom_refresh(){
     this.dispatch('zoom', this.zoom);
     this.canvas_x = (this.canvas_x / this.zoom_last_value) * this.zoom;
@@ -588,18 +636,27 @@ export default class Drawflow {
     this.zoom_last_value = this.zoom;
     this.precanvas.style.transform = "translate("+this.canvas_x+"px, "+this.canvas_y+"px) scale("+this.zoom+")";
   }
+  /**
+   * 放大
+   */
   zoom_in() {
     if(this.zoom < this.zoom_max) {
         this.zoom+=this.zoom_value;
         this.zoom_refresh();
     }
   }
+  /**
+   * 缩小
+   */
   zoom_out() {
     if(this.zoom > this.zoom_min) {
       this.zoom-=this.zoom_value;
         this.zoom_refresh();
     }
   }
+  /**
+   * 重置缩放
+   */
   zoom_reset(){
     if(this.zoom != 1) {
       this.zoom = 1;
@@ -607,6 +664,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 生成贝塞尔曲线路径（连线用）
+   */
   createCurvature(start_pos_x, start_pos_y, end_pos_x, end_pos_y, curvature_value, type) {
     var line_x = start_pos_x;
     var line_y = start_pos_y;
@@ -656,6 +716,9 @@ export default class Drawflow {
 
   }
 
+  /**
+   * 开始绘制连线（鼠标按下输出端口时）
+   */
   drawConnection(ele) {
     var connection = document.createElementNS('http://www.w3.org/2000/svg',"svg");
     this.connection_ele = connection;
@@ -672,6 +735,9 @@ export default class Drawflow {
 
   }
 
+  /**
+   * 连线跟随鼠标移动
+   */
   updateConnection(eX, eY) {
     const precanvas = this.precanvas;
     const zoom = this.zoom;
@@ -693,6 +759,9 @@ export default class Drawflow {
 
   }
 
+  /**
+   * 添加连线（数据和SVG）
+   */
   addConnection(id_output, id_input, output_class, input_class) {
     var nodeOneModule = this.getModuleFromNodeId(id_output);
     var nodeTwoModule = this.getModuleFromNodeId(id_input);
@@ -735,6 +804,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 更新指定节点相关的所有连线
+   */
   updateConnectionNodes(id) {
 
     // Aquí nos quedamos;
@@ -1054,6 +1126,9 @@ export default class Drawflow {
     })
   }
 
+  /**
+   * 双击事件，添加/删除中间点
+   */
   dblclick(e) {
     if(this.connection_selected != null && this.reroute) {
         this.createReroutePoint(this.connection_selected);
@@ -1064,6 +1139,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 创建中间点
+   */
   createReroutePoint(ele) {
       this.connection_selected.classList.remove("selected");
       const nodeUpdate = this.connection_selected.parentElement.classList[2].slice(9);
@@ -1130,6 +1208,9 @@ export default class Drawflow {
       this.updateConnectionNodes(nodeUpdate);
   }
 
+  /**
+   * 删除中间点
+   */
   removeReroutePoint(ele) {
     const nodeUpdate = ele.parentElement.classList[2].slice(9)
     const nodeUpdateIn = ele.parentElement.classList[1].slice(13);
@@ -1159,14 +1240,23 @@ export default class Drawflow {
     this.updateConnectionNodes(nodeUpdate);
   }
 
+  /**
+   * 注册自定义节点
+   */
   registerNode(name, html, props = null, options = null) {
     this.noderegister[name] = {html: html, props: props, options: options};
   }
 
+  /**
+   * 根据ID获取节点数据
+   */
   getNodeFromId(id) {
     var moduleName = this.getModuleFromNodeId(id)
     return JSON.parse(JSON.stringify(this.drawflow.drawflow[moduleName].data[id]));
   }
+  /**
+   * 根据名称获取所有节点ID
+   */
   getNodesFromName(name) {
     var nodes = [];
     const editor = this.drawflow.drawflow
@@ -1180,6 +1270,9 @@ export default class Drawflow {
     return nodes;
   }
 
+  /**
+   * 添加节点
+   */
   addNode (name, num_in, num_out, ele_pos_x, ele_pos_y, classoverride, data, html, typenode = false) {
     if (this.useuuid) {
       var newNodeId = this.getUuid();
@@ -1335,6 +1428,9 @@ export default class Drawflow {
     return newNodeId;
   }
 
+  /**
+   * 导入节点（用于数据还原）
+   */
   addNodeImport (dataNode, precanvas) {
     const parent = document.createElement('div');
     parent.classList.add("parent-node");
@@ -1454,6 +1550,9 @@ export default class Drawflow {
     this.precanvas.appendChild(parent);
   }
 
+  /**
+   * 导入中间点
+   */
   addRerouteImport(dataNode) {
     const reroute_width = this.reroute_width
     const reroute_fix_curvature = this.reroute_fix_curvature
@@ -1496,6 +1595,9 @@ export default class Drawflow {
     });
   }
 
+  /**
+   * 输入框内容变更时，更新节点数据
+   */
   updateNodeValue(event) {
     var attr = event.target.attributes
     for (var i = 0; i < attr.length; i++) {
@@ -1517,6 +1619,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 通过ID更新节点数据
+   */
   updateNodeDataFromId(id, data) {
     var moduleName = this.getModuleFromNodeId(id)
     this.drawflow.drawflow[moduleName].data[id].data = data;
@@ -1563,6 +1668,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 添加输入端口
+   */
   addNodeInput(id) {
     var moduleName = this.getModuleFromNodeId(id)
     const infoNode = this.getNodeFromId(id)
@@ -1580,6 +1688,9 @@ export default class Drawflow {
     this.drawflow.drawflow[moduleName].data[id].inputs["input_"+(numInputs+1)] = { "connections": []};
   }
 
+  /**
+   * 添加输出端口
+   */
   addNodeOutput(id) {
     var moduleName = this.getModuleFromNodeId(id)
     const infoNode = this.getNodeFromId(id)
@@ -1597,6 +1708,9 @@ export default class Drawflow {
     this.drawflow.drawflow[moduleName].data[id].outputs["output_"+(numOutputs+1)] = { "connections": []};
   }
 
+  /**
+   * 移除输入端口
+   */
   removeNodeInput(id, input_class) {
     var moduleName = this.getModuleFromNodeId(id)
     const infoNode = this.getNodeFromId(id)
@@ -1668,6 +1782,9 @@ export default class Drawflow {
     this.updateConnectionNodes('node-'+id);
   }
 
+  /**
+   * 移除输出端口
+   */
   removeNodeOutput(id, output_class) {
     var moduleName = this.getModuleFromNodeId(id)
     const infoNode = this.getNodeFromId(id)
@@ -1743,6 +1860,9 @@ export default class Drawflow {
     this.updateConnectionNodes('node-'+id);
   }
 
+  /**
+   * 移除节点
+   */
   removeNodeId(id) {
     this.removeConnectionNodeId(id);
     var moduleName = this.getModuleFromNodeId(id.slice(5))
@@ -1753,6 +1873,9 @@ export default class Drawflow {
     this.dispatch('nodeRemoved', id.slice(5));
   }
 
+  /**
+   * 移除选中的连线
+   */
   removeConnection() {
     if(this.connection_selected != null) {
       var listclass = this.connection_selected.parentElement.classList;
@@ -1772,6 +1895,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 移除单条连线
+   */
   removeSingleConnection(id_output, id_input, output_class, input_class) {
     var nodeOneModule = this.getModuleFromNodeId(id_output);
     var nodeTwoModule = this.getModuleFromNodeId(id_input);
@@ -1810,6 +1936,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 移除与节点相关的所有连线
+   */
   removeConnectionNodeId(id) {
     const idSearchIn = 'node_in_'+id;
     const idSearchOut = 'node_out_'+id;
@@ -1854,6 +1983,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * 通过节点ID获取所属模块
+   */
   getModuleFromNodeId(id) {
     var nameModule;
     const editor = this.drawflow.drawflow
@@ -1867,10 +1999,16 @@ export default class Drawflow {
     return nameModule;
   }
 
+  /**
+   * 添加模块
+   */
   addModule(name) {
     this.drawflow.drawflow[name] =  { "data": {} };
     this.dispatch('moduleCreated', name);
   }
+  /**
+   * 切换模块
+   */
   changeModule(name) {
     this.dispatch('moduleChanged', name);
     this.module = name;
@@ -1887,6 +2025,9 @@ export default class Drawflow {
     this.import(this.drawflow, false);
   }
 
+  /**
+   * 移除模块
+   */
   removeModule(name) {
     if(this.module === name) {
       this.changeModule('Home');
@@ -1895,21 +2036,33 @@ export default class Drawflow {
     this.dispatch('moduleRemoved', name);
   }
 
+  /**
+   * 清空当前模块
+   */
   clearModuleSelected() {
     this.precanvas.innerHTML = "";
     this.drawflow.drawflow[this.module] =  { "data": {} };
   }
 
+  /**
+   * 清空所有数据
+   */
   clear () {
     this.precanvas.innerHTML = "";
     this.drawflow = { "drawflow": { "Home": { "data": {} }}};
   }
+  /**
+   * 导出数据
+   */
   export () {
     const dataExport = JSON.parse(JSON.stringify(this.drawflow));
     this.dispatch('export', dataExport);
     return dataExport;
   }
 
+  /**
+   * 导入数据
+   */
   import (data, notifi = true) {
     this.clear();
     this.drawflow = JSON.parse(JSON.stringify(data));
@@ -1919,7 +2072,11 @@ export default class Drawflow {
     }
   }
 
-  /* Events */
+  /* 事件相关方法 */
+
+  /**
+   * 注册事件监听器
+   */
   on (event, callback) {
        // Check if the callback is not a function
        if (typeof callback !== 'function') {
@@ -1940,6 +2097,9 @@ export default class Drawflow {
        this.events[event].listeners.push(callback);
    }
 
+   /**
+   * 移除事件监听器
+   */
    removeListener (event, callback) {
       // Check if this event not exists
 
@@ -1951,6 +2111,9 @@ export default class Drawflow {
       if (hasListener) listeners.splice(listenerIndex, 1)
    }
 
+   /**
+   * 触发事件
+   */
    dispatch (event, details) {
        // Check if this event not exists
        if (this.events[event] === undefined) {
@@ -1962,6 +2125,9 @@ export default class Drawflow {
        });
    }
 
+    /**
+     * 生成UUID
+     */
     getUuid() {
         // http://www.ietf.org/rfc/rfc4122.txt
         var s = [];
