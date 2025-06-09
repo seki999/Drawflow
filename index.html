@@ -7,22 +7,37 @@
   <title>Drawflow</title>
 </head>
 <body>
+  <!-- 引入 Drawflow 主库 -->
   <script src="drawflow.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha256-KzZiKy0DWYsnwMF+X1DvQngQ2/FxF7MF3Ff72XcpuPs=" crossorigin="anonymous"></script>
+  <!-- 引入 FontAwesome 图标库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+  <!-- 引入 Drawflow 样式 -->
   <link rel="stylesheet" type="text/css" href="src/drawflow.css" />
+  <!-- 引入自定义美化样式 -->
   <link rel="stylesheet" type="text/css" href="docs/beautiful.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous" />
+  <!-- 引入 FontAwesome 样式 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" crossorigin="anonymous" />
+  <!-- 引入 Roboto 字体 -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <!-- 引入弹窗库 SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <!-- 引入弹窗库 micromodal -->
   <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
 
-
+  <!-- 页面头部 -->
   <header>
     <h2>Drawflow</h2>
-    <div class="github-link"><a href="https://github.com/jerosoler/Drawflow" target="_blank"><i class="fab fa-github fa-3x"></i></a></div>
+    <div class="github-link">
+      <a href="https://github.com/jerosoler/Drawflow" target="_blank">
+        <i class="fab fa-github fa-3x"></i>
+      </a>
+    </div>
   </header>
+
   <div class="wrapper">
+    <!-- 左侧拖拽节点菜单 -->
     <div class="col">
+      <!-- 每个可拖拽节点，data-node 标识类型 -->
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="facebook">
         <i class="fab fa-facebook"></i><span> Facebook</span>
       </div>
@@ -62,9 +77,9 @@
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="dbclick">
         <i class="fas fa-mouse"></i><span> DBClick!</span>
       </div>
-
-
     </div>
+
+    <!-- 右侧主画布和菜单 -->
     <div class="col-right">
       <div class="menu">
         <ul>
@@ -72,16 +87,20 @@
           <li onclick="editor.changeModule('Other'); changeModule(event);">Other Module</li>
         </ul>
       </div>
+      <!-- Drawflow 主画布区域 -->
       <div id="drawflow" ondrop="drop(event)" ondragover="allowDrop(event)">
-
+        <!-- 导出按钮 -->
         <div class="btn-export" onclick="Swal.fire({ title: 'Export',
         html: '<pre><code>'+JSON.stringify(editor.export(), null,4)+'</code></pre>'
         })">Export</div>
+        <!-- 清空按钮 -->
         <div class="btn-clear" onclick="editor.clearModuleSelected()">Clear</div>
+        <!-- 锁定/解锁编辑模式按钮 -->
         <div class="btn-lock">
           <i id="lock" class="fas fa-lock" onclick="editor.editor_mode='fixed'; changeMode('lock');"></i>
           <i id="unlock" class="fas fa-lock-open" onclick="editor.editor_mode='edit'; changeMode('unlock');" style="display:none;"></i>
         </div>
+        <!-- 缩放控制按钮 -->
         <div class="bar-zoom">
           <i class="fas fa-search-minus" onclick="editor.zoom_out()"></i>
           <i class="fas fa-search" onclick="editor.zoom_reset()"></i>
@@ -92,151 +111,101 @@
   </div>
 
   <script>
-
+    // 获取画布 DOM 元素
     var id = document.getElementById("drawflow");
+    // 创建 Drawflow 编辑器实例
     const editor = new Drawflow(id);
+    // 启用可重路由（可拖动中间点）
     editor.reroute = true;
     editor.reroute_fix_curvature = true;
     editor.force_first_input = false;
 
-  /*
-    editor.createCurvature = function(start_pos_x, start_pos_y, end_pos_x, end_pos_y, curvature_value, type) {
-      var center_x = ((end_pos_x - start_pos_x)/2)+start_pos_x;
-      return ' M ' + start_pos_x + ' ' + start_pos_y + ' L '+ center_x +' ' +  start_pos_y  + ' L ' + center_x + ' ' +  end_pos_y  + ' L ' + end_pos_x + ' ' + end_pos_y;
-    }*/
-
-
-
-    
-
+    // 导入初始数据
     const dataToImport =  {"drawflow":{"Home":{"data":{"1":{"id":1,"name":"welcome","data":{},"class":"welcome","html":"\n    <div>\n      <div class=\"title-box\">👏 Welcome!!</div>\n      <div class=\"box\">\n        <p>Simple flow library <b>demo</b>\n        <a href=\"https://github.com/jerosoler/Drawflow\" target=\"_blank\">Drawflow</a> by <b>Jero Soler</b></p><br>\n\n        <p>Multiple input / outputs<br>\n           Data sync nodes<br>\n           Import / export<br>\n           Modules support<br>\n           Simple use<br>\n           Type: Fixed or Edit<br>\n           Events: view console<br>\n           Pure Javascript<br>\n        </p>\n        <br>\n        <p><b><u>Shortkeys:</u></b></p>\n        <p>🎹 <b>Delete</b> for remove selected<br>\n        💠 Mouse Left Click == Move<br>\n        ❌ Mouse Right == Delete Option<br>\n        🔍 Ctrl + Wheel == Zoom<br>\n        📱 Mobile support<br>\n        ...</p>\n      </div>\n    </div>\n    ", "typenode": false, "inputs":{},"outputs":{},"pos_x":50,"pos_y":50},"2":{"id":2,"name":"slack","data":{},"class":"slack","html":"\n          <div>\n            <div class=\"title-box\"><i class=\"fab fa-slack\"></i> Slack chat message</div>\n          </div>\n          ", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"7","input":"output_1"}]}},"outputs":{},"pos_x":1028,"pos_y":87},"3":{"id":3,"name":"telegram","data":{"channel":"channel_2"},"class":"telegram","html":"\n          <div>\n            <div class=\"title-box\"><i class=\"fab fa-telegram-plane\"></i> Telegram bot</div>\n            <div class=\"box\">\n              <p>Send to telegram</p>\n              <p>select channel</p>\n              <select df-channel>\n                <option value=\"channel_1\">Channel 1</option>\n                <option value=\"channel_2\">Channel 2</option>\n                <option value=\"channel_3\">Channel 3</option>\n                <option value=\"channel_4\">Channel 4</option>\n              </select>\n            </div>\n          </div>\n          ", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"7","input":"output_1"}]}},"outputs":{},"pos_x":1032,"pos_y":184},"4":{"id":4,"name":"email","data":{},"class":"email","html":"\n            <div>\n              <div class=\"title-box\"><i class=\"fas fa-at\"></i> Send Email </div>\n            </div>\n            ", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"}]}},"outputs":{},"pos_x":1033,"pos_y":439},"5":{"id":5,"name":"template","data":{"template":"Write your template"},"class":"template","html":"\n            <div>\n              <div class=\"title-box\"><i class=\"fas fa-code\"></i> Template</div>\n              <div class=\"box\">\n                Ger Vars\n                <textarea df-template></textarea>\n                Output template with vars\n              </div>\n            </div>\n            ", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"6","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"4","output":"input_1"},{"node":"11","output":"input_1"}]}},"pos_x":607,"pos_y":304},"6":{"id":6,"name":"github","data":{"name":"https://github.com/jerosoler/Drawflow"},"class":"github","html":"\n          <div>\n            <div class=\"title-box\"><i class=\"fab fa-github \"></i> Github Stars</div>\n            <div class=\"box\">\n              <p>Enter repository url</p>\n            <input type=\"text\" df-name>\n            </div>\n          </div>\n          ", "typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"5","output":"input_1"}]}},"pos_x":341,"pos_y":191},"7":{"id":7,"name":"facebook","data":{},"class":"facebook","html":"\n        <div>\n          <div class=\"title-box\"><i class=\"fab fa-facebook\"></i> Facebook Message</div>\n        </div>\n        ", "typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"2","output":"input_1"},{"node":"3","output":"input_1"},{"node":"11","output":"input_1"}]}},"pos_x":347,"pos_y":87},"11":{"id":11,"name":"log","data":{},"class":"log","html":"\n            <div>\n              <div class=\"title-box\"><i class=\"fas fa-file-signature\"></i> Save log file </div>\n            </div>\n            ", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"},{"node":"7","input":"output_1"}]}},"outputs":{},"pos_x":1031,"pos_y":363}}},"Other":{"data":{"8":{"id":8,"name":"personalized","data":{},"class":"personalized","html":"\n            <div>\n              Personalized\n            </div>\n            ", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"12","input":"output_1"},{"node":"12","input":"output_2"},{"node":"12","input":"output_3"},{"node":"12","input":"output_4"}]}},"outputs":{"output_1":{"connections":[{"node":"9","output":"input_1"}]}},"pos_x":764,"pos_y":227},"9":{"id":9,"name":"dbclick","data":{"name":"Hello World!!"},"class":"dbclick","html":"\n            <div>\n            <div class=\"title-box\"><i class=\"fas fa-mouse\"></i> Db Click</div>\n              <div class=\"box dbclickbox\" ondblclick=\"showpopup(event)\">\n                Db Click here\n                <div class=\"modal\" style=\"display:none\">\n                  <div class=\"modal-content\">\n                    <span class=\"close\" onclick=\"closemodal(event)\">&times;</span>\n                    Change your variable {name} !\n                    <input type=\"text\" df-name>\n                  </div>\n\n                </div>\n              </div>\n            </div>\n            ", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"8","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"12","output":"input_2"}]}},"pos_x":209,"pos_y":38},"12":{"id":12,"name":"multiple","data":{},"class":"multiple","html":"\n            <div>\n              <div class=\"box\">\n                Multiple!\n              </div>\n            </div>\n            ", "typenode": false, "inputs":{"input_1":{"connections":[]},"input_2":{"connections":[{"node":"9","input":"output_1"}]},"input_3":{"connections":[]}},"outputs":{"output_1":{"connections":[{"node":"8","output":"input_1"}]},"output_2":{"connections":[{"node":"8","output":"input_1"}]},"output_3":{"connections":[{"node":"8","output":"input_1"}]},"output_4":{"connections":[{"node":"8","output":"input_1"}]}},"pos_x":179,"pos_y":272}}}}}
     editor.start();
     editor.import(dataToImport);
 
-
-
-  /*
-    var welcome = `
-    <div>
-      <div class="title-box">👏 Welcome!!</div>
-      <div class="box">
-        <p>Simple flow library <b>demo</b>
-        <a href="https://github.com/jerosoler/Drawflow" target="_blank">Drawflow</a> by <b>Jero Soler</b></p><br>
-
-        <p>Multiple input / outputs<br>
-           Data sync nodes<br>
-           Import / export<br>
-           Modules support<br>
-           Simple use<br>
-           Type: Fixed or Edit<br>
-           Events: view console<br>
-           Pure Javascript<br>
-        </p>
-        <br>
-        <p><b><u>Shortkeys:</u></b></p>
-        <p>🎹 <b>Delete</b> for remove selected<br>
-        💠 Mouse Left Click == Move<br>
-        ❌ Mouse Right == Delete Option<br>
-        🔍 Ctrl + Wheel == Zoom<br>
-        📱 Mobile support<br>
-        ...</p>
-      </div>
-    </div>
-    `;
-*/
-
-
-    //editor.addNode(name, "typenode": false,  inputs, outputs, posx, posy, class, data, html);
-    /*editor.addNode('welcome', 0, 0, 50, 50, 'welcome', {}, welcome );
-    editor.addModule('Other');
-    */
-
-    // Events!
+    // 事件监听：节点创建
     editor.on('nodeCreated', function(id) {
       console.log("Node created " + id);
-    })
-
+    });
+    // 事件监听：节点删除
     editor.on('nodeRemoved', function(id) {
       console.log("Node removed " + id);
-    })
-
+    });
+    // 事件监听：节点选中
     editor.on('nodeSelected', function(id) {
       console.log("Node selected " + id);
-    })
-
+    });
+    // 事件监听：模块创建
     editor.on('moduleCreated', function(name) {
       console.log("Module Created " + name);
-    })
-
+    });
+    // 事件监听：模块切换
     editor.on('moduleChanged', function(name) {
       console.log("Module Changed " + name);
-    })
-
+    });
+    // 事件监听：连接创建
     editor.on('connectionCreated', function(connection) {
       console.log('Connection created');
       console.log(connection);
-    })
-
+    });
+    // 事件监听：连接删除
     editor.on('connectionRemoved', function(connection) {
       console.log('Connection removed');
       console.log(connection);
-    })
-/*
-    editor.on('mouseMove', function(position) {
-      console.log('Position mouse x:' + position.x + ' y:'+ position.y);
-    })
-*/
+    });
+    // 事件监听：节点移动
     editor.on('nodeMoved', function(id) {
       console.log("Node moved " + id);
-    })
-
+    });
+    // 事件监听：缩放
     editor.on('zoom', function(zoom) {
       console.log('Zoom level ' + zoom);
-    })
-
+    });
+    // 事件监听：画布平移
     editor.on('translate', function(position) {
       console.log('Translate x:' + position.x + ' y:'+ position.y);
-    })
-
+    });
+    // 事件监听：添加/移除 reroute 点
     editor.on('addReroute', function(id) {
       console.log("Reroute added " + id);
-    })
-
+    });
     editor.on('removeReroute', function(id) {
       console.log("Reroute removed " + id);
-    })
-    /* DRAG EVENT */
+    });
 
-    /* Mouse and Touch Actions */
-
+    // 移动端拖拽支持
     var elements = document.getElementsByClassName('drag-drawflow');
     for (var i = 0; i < elements.length; i++) {
       elements[i].addEventListener('touchend', drop, false);
       elements[i].addEventListener('touchmove', positionMobile, false);
       elements[i].addEventListener('touchstart', drag, false );
     }
-
     var mobile_item_selec = '';
     var mobile_last_move = null;
-   function positionMobile(ev) {
-     mobile_last_move = ev;
-   }
+    function positionMobile(ev) {
+      mobile_last_move = ev;
+    }
 
-   function allowDrop(ev) {
+    // 允许拖拽放置
+    function allowDrop(ev) {
       ev.preventDefault();
     }
 
+    // 拖拽开始
     function drag(ev) {
       if (ev.type === "touchstart") {
         mobile_item_selec = ev.target.closest(".drag-drawflow").getAttribute('data-node');
       } else {
-      ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
+        ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
       }
     }
 
+    // 拖拽放下
     function drop(ev) {
       if (ev.type === "touchend") {
-        var parentdrawflow = document.elementFromPoint( mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY).closest("#drawflow");
+        var parentdrawflow = document.elementFromPoint(mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY).closest("#drawflow");
         if(parentdrawflow != null) {
           addNodeToDrawFlow(mobile_item_selec, mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY);
         }
@@ -246,24 +215,25 @@
         var data = ev.dataTransfer.getData("node");
         addNodeToDrawFlow(data, ev.clientX, ev.clientY);
       }
-
     }
 
+    // 添加节点到画布
     function addNodeToDrawFlow(name, pos_x, pos_y) {
       if(editor.editor_mode === 'fixed') {
         return false;
       }
+      // 计算缩放和平移后的实际坐标
       pos_x = pos_x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) - (editor.precanvas.getBoundingClientRect().x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
       pos_y = pos_y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) - (editor.precanvas.getBoundingClientRect().y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
 
-
+      // 根据节点类型添加不同内容
       switch (name) {
         case 'facebook':
-        var facebook = `
-        <div>
-          <div class="title-box"><i class="fab fa-facebook"></i> Facebook Message</div>
-        </div>
-        `;
+          var facebook = `
+          <div>
+            <div class="title-box"><i class="fab fa-facebook"></i> Facebook Message</div>
+          </div>
+          `;
           editor.addNode('facebook', 0,  1, pos_x, pos_y, 'facebook', {}, facebook );
           break;
         case 'slack':
@@ -406,46 +376,38 @@
       }
     }
 
-  var transform = '';
-  function showpopup(e) {
-    e.target.closest(".drawflow-node").style.zIndex = "9999";
-    e.target.children[0].style.display = "block";
-    //document.getElementById("modalfix").style.display = "block";
+    // 弹窗相关函数
+    var transform = '';
+    function showpopup(e) {
+      e.target.closest(".drawflow-node").style.zIndex = "9999";
+      e.target.children[0].style.display = "block";
+      transform = editor.precanvas.style.transform;
+      editor.precanvas.style.transform = '';
+      editor.precanvas.style.left = editor.canvas_x +'px';
+      editor.precanvas.style.top = editor.canvas_y +'px';
+      editor.editor_mode = "fixed";
+    }
 
-    //e.target.children[0].style.transform = 'translate('+translate.x+'px, '+translate.y+'px)';
-    transform = editor.precanvas.style.transform;
-    editor.precanvas.style.transform = '';
-    editor.precanvas.style.left = editor.canvas_x +'px';
-    editor.precanvas.style.top = editor.canvas_y +'px';
-    console.log(transform);
-
-    //e.target.children[0].style.top  =  -editor.canvas_y - editor.container.offsetTop +'px';
-    //e.target.children[0].style.left  =  -editor.canvas_x  - editor.container.offsetLeft +'px';
-    editor.editor_mode = "fixed";
-
-  }
-
-   function closemodal(e) {
-     e.target.closest(".drawflow-node").style.zIndex = "2";
-     e.target.parentElement.parentElement.style.display  ="none";
-     //document.getElementById("modalfix").style.display = "none";
-     editor.precanvas.style.transform = transform;
-       editor.precanvas.style.left = '0px';
-       editor.precanvas.style.top = '0px';
+    function closemodal(e) {
+      e.target.closest(".drawflow-node").style.zIndex = "2";
+      e.target.parentElement.parentElement.style.display  ="none";
+      editor.precanvas.style.transform = transform;
+      editor.precanvas.style.left = '0px';
+      editor.precanvas.style.top = '0px';
       editor.editor_mode = "edit";
-   }
+    }
 
+    // 切换模块菜单选中状态
     function changeModule(event) {
       var all = document.querySelectorAll(".menu ul li");
-        for (var i = 0; i < all.length; i++) {
-          all[i].classList.remove('selected');
-        }
+      for (var i = 0; i < all.length; i++) {
+        all[i].classList.remove('selected');
+      }
       event.target.classList.add('selected');
     }
 
+    // 切换编辑/锁定模式
     function changeMode(option) {
-
-    //console.log(lock.id);
       if(option == 'lock') {
         lock.style.display = 'none';
         unlock.style.display = 'block';
@@ -453,9 +415,7 @@
         lock.style.display = 'block';
         unlock.style.display = 'none';
       }
-
     }
-
   </script>
 </body>
 </html>

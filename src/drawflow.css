@@ -1,66 +1,75 @@
+/* Drawflow 父容器样式 */
 .parent-drawflow {
-  display: flex;
-  overflow: hidden;
-  touch-action: none;
-  outline:none;
+  display: flex; /* 使用 flex 布局 */
+  overflow: hidden; /* 隐藏超出容器的内容 */
+  touch-action: none; /* 禁用触摸操作，例如平移和缩放，由库自行处理 */
+  outline:none; /* 移除焦点时的轮廓 */
 }
 
+/* Drawflow 画布主要容器样式 */
 .drawflow {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  user-select: none;
-  perspective: 0;
+  width: 100%; /* 宽度占满父容器 */
+  height: 100%; /* 高度占满父容器 */
+  position: relative; /* 相对定位，用于子元素的绝对定位 */
+  user-select: none; /* 禁止用户选择文本 */
+  perspective: 0; /* 用于 3D 变换，此处设置为 0 可能表示不使用或重置 */
 }
 
+/* Drawflow 节点父元素样式 */
 .drawflow .parent-node {
-  position: relative;
-
+  position: relative; /* 相对定位，用于节点内部元素的定位 */
 }
 
+/* Drawflow 节点基本样式 */
 .drawflow .drawflow-node {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  background: cyan;
-  width: 160px;
-  min-height: 40px;
-  border-radius:4px;
-  border: 2px solid black;
-  color: black;
-  z-index: 2;
-  padding: 15px;
+  display: flex; /* 使用 flex 布局 */
+  align-items: center; /* 垂直居中节点内容 */
+  position: absolute; /* 绝对定位，相对于 .drawflow 容器 */
+  background: cyan; /* 节点背景颜色 */
+  width: 160px; /* 节点固定宽度 */
+  min-height: 40px; /* 节点最小高度 */
+  border-radius:4px; /* 节点边框圆角 */
+  border: 2px solid black; /* 节点边框样式 */
+  color: black; /* 节点文字颜色 */
+  z-index: 2; /* 堆叠顺序，确保节点在连接线之上 */
+  padding: 15px; /* 节点内边距 */
 }
 
+/* 被选中节点的样式 */
 .drawflow .drawflow-node.selected {
-  background: red;
+  background: red; /* 被选中节点的背景颜色 */
 }
+
+/* 鼠标悬停在节点上时的样式 */
 .drawflow .drawflow-node:hover {
-  cursor: move;
+  cursor: move; /* 鼠标指针变为移动手势 */
 }
 
+/* 节点输入和输出区域的容器样式 */
 .drawflow .drawflow-node .inputs, .drawflow .drawflow-node .outputs {
-  width: 0px;
+  width: 0px; /* 初始宽度为0，可能由 JavaScript 控制或用于特定布局 */
 }
 
+/* 节点内容区域样式 */
 .drawflow .drawflow-node .drawflow_content_node {
-  width: 100%;
-  display: block;
+  width: 100%; /* 内容区域宽度占满节点 */
+  display: block; /* 使内容区域表现为块级元素 */
 }
 
+/* 节点输入和输出点的通用样式 */
 .drawflow .drawflow-node .input, .drawflow .drawflow-node .output {
-
-  position: relative;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  border: 2px solid black;
-  cursor: crosshair;
-  z-index: 1;
-  margin-bottom: 5px;
+  position: relative; /* 相对定位 */
+  width: 20px; /* 输入/输出点的宽度 */
+  height: 20px; /* 输入/输出点的高度 */
+  background: white; /* 输入/输出点的背景颜色 */
+  border-radius: 50%; /* 使输入/输出点呈圆形 */
+  border: 2px solid black; /* 输入/输出点的边框 */
+  cursor: crosshair; /* 鼠标指针变为十字线，表示可连接 */
+  z-index: 1; /* 堆叠顺序，低于节点本身，但高于连接线 */
+  margin-bottom: 5px; /* 输入/输出点之间的底部外边距 */
 }
 
+.drawflow .drawflow-node .input.top, /* 位于节点顶部的输入点样式 */
 .drawflow .drawflow-node .input.top,
 .drawflow .drawflow-node .output.top {
   top: -10px;
@@ -69,6 +78,7 @@
   margin-bottom: 0;
 }
 
+.drawflow .drawflow-node .input.bottom, /* 位于节点底部的输入点样式 */
 .drawflow .drawflow-node .input.bottom,
 .drawflow .drawflow-node .output.bottom {
   bottom: -10px;
@@ -77,59 +87,74 @@
   margin-bottom: 0;
 }
 
+/* 节点输入点特定样式 */
 .drawflow .drawflow-node .input {
-  left: -27px;
-  top: 2px;
-  background: yellow;
+  left: -27px; /* 相对于节点左侧的偏移量 */
+  top: 2px; /* 相对于节点顶部的偏移量 (会被 .top 或 .bottom 覆盖) */
+  background: yellow; /* 输入点背景颜色 */
 }
+
+/* 节点输出点特定样式 */
 .drawflow .drawflow-node .output {
-  right: -3px;
-  top: 2px;
+  right: -3px; /* 相对于节点右侧的偏移量 */
+  top: 2px; /* 相对于节点顶部的偏移量 (会被 .top 或 .bottom 覆盖) */
 }
 
+/* SVG 容器样式，用于绘制连接线 */
 .drawflow svg {
-  z-index: 0;
-  position: absolute;
-  overflow: visible !important;
+  z-index: 0; /* 堆叠顺序，位于节点之下 */
+  position: absolute; /* 绝对定位 */
+  overflow: visible !important; /* 允许 SVG 内容超出其边界，确保连接线完整显示 */
 }
+
+/* 连接线容器样式 */
 .drawflow .connection {
-  position: absolute;
-  pointer-events: none;
-  aspect-ratio: 1 / 1;
+  position: absolute; /* 绝对定位 */
+  pointer-events: none; /* 容器本身不响应鼠标事件，事件由其子元素（路径）处理 */
+  aspect-ratio: 1 / 1; /* 保持宽高比为1:1，可能用于特定布局或计算 */
 }
+
+/* 连接线主路径样式 */
 .drawflow .connection .main-path {
-  fill: none;
-  stroke-width: 5px;
-  stroke: steelblue;
-  pointer-events: all;
+  fill: none; /* 路径不填充颜色 */
+  stroke-width: 5px; /* 路径描边宽度 */
+  stroke: steelblue; /* 路径描边颜色 */
+  pointer-events: all; /* 路径响应所有鼠标事件 */
 }
+
+/* 鼠标悬停在连接线主路径上时的样式 */
 .drawflow .connection .main-path:hover {
-  stroke: #1266ab;
-  cursor: pointer;
+  stroke: #1266ab; /* 悬停时路径描边颜色变深 */
+  cursor: pointer; /* 鼠标指针变为手型 */
 }
 
+/* 被选中的连接线主路径样式 */
 .drawflow .connection .main-path.selected {
-  stroke: #43b993;
+  stroke: #43b993; /* 被选中时路径描边颜色 */
 }
 
+/* 连接线上的可拖动点（用于曲线调整）样式 */
 .drawflow .connection .point {
-  cursor: move;
-  stroke: black;
-  stroke-width: 2;
-  fill: white;
-  pointer-events: all;
+  cursor: move; /* 鼠标指针变为移动手势 */
+  stroke: black; /* 点的描边颜色 */
+  stroke-width: 2; /* 点的描边宽度 */
+  fill: white; /* 点的填充颜色 */
+  pointer-events: all; /* 点响应所有鼠标事件 */
 }
 
+/* 被选中或鼠标悬停在连接线上的可拖动点时的样式 */
 .drawflow .connection .point.selected, .drawflow .connection .point:hover {
-  fill: #1266ab;
+  fill: #1266ab; /* 填充颜色改变 */
 }
 
+/* Drawflow 画布内的通用主路径样式 (似乎与 .connection .main-path 重复，可能用于不同上下文或作为备用) */
 .drawflow .main-path {
-  fill: none;
-  stroke-width: 5px;
-  stroke: steelblue;
+  fill: none; /* 路径不填充颜色 */
+  stroke-width: 5px; /* 路径描边宽度 */
+  stroke: steelblue; /* 路径描边颜色 */
 }
 
+.drawflow-delete { /* 删除按钮通用样式 */
 .drawflow-delete {
   position: absolute;
   display: block;
@@ -146,12 +171,15 @@
   font-family: monospace;
   cursor: pointer;
 }
+
+/* 直接在 Drawflow 画布上的删除按钮样式 (例如，用于删除选中的节点或连接) */
 .drawflow > .drawflow-delete {
-  margin-left: -15px;
-  margin-top: 15px;
+  margin-left: -15px; /* 水平偏移，使其部分覆盖在元素上 */
+  margin-top: 15px; /* 垂直偏移 */
 }
 
+/* 节点内部的删除按钮样式 */
 .parent-node .drawflow-delete {
-  right: -15px;
-  top: -15px;
+  right: -15px; /* 定位到节点的右上角外部 */
+  top: -15px; /* 定位到节点的右上角外部 */
 }
